@@ -7,7 +7,7 @@
 
 ---
 
-## 🔥 O Problema
+## O Problema
 
 Ao suspender o notebook (fechar a tampa ou usar `systemctl suspend`), o sistema aparentava estar suspenso — tela apagada, ventoinhas paradas — mas o hardware continuava **completamente ativo e aquecendo**.
 
@@ -15,7 +15,7 @@ Em cenários críticos, o notebook podia ser guardado na mochila nesse estado e 
 
 ---
 
-## 🔎 Causa Raiz
+## Causa Raiz
 
 O sistema entrava corretamente em suspensão S3 (deep sleep), mas o controlador **XHCI (USB)** gerava um evento que acordava o hardware parcialmente. Nesse estado intermediário:
 
@@ -25,7 +25,8 @@ O sistema entrava corretamente em suspensão S3 (deep sleep), mas o controlador 
 - O sistema não respondia a interações normais
 
 Evidência nos logs do kernel:
-```
+
+```bash
 xhci_hcd 0000:38:00.0: xHC error in resume, USBSTS 0x401, Reinit
 ```
 
@@ -33,10 +34,10 @@ Esse erro indica que o controlador USB/Thunderbolt (`Intel Device 1135`) acordav
 
 ---
 
-## 🖥️ Configuração do Sistema (referência)
+## Configuração do Sistema (referência)
 
 | Item | Valor |
-|------|-------|
+| ------ | ------- |
 | Kernel | 6.17.0-23-generic |
 | BIOS | FX608JHR.309 |
 | Driver NVIDIA | 595.58.03 |
@@ -48,7 +49,7 @@ Esse erro indica que o controlador USB/Thunderbolt (`Intel Device 1135`) acordav
 
 ---
 
-## ✅ Solução Aplicada
+## Solução Aplicada
 
 A solução consiste em três partes:
 
@@ -58,7 +59,7 @@ A solução consiste em três partes:
 
 ---
 
-## 📋 Passo a Passo
+## Passo a Passo
 
 ### Passo 1 — Verificar o modo de suspensão atual
 
@@ -80,11 +81,12 @@ sudo nano /etc/default/grub
 
 Localize a linha `GRUB_CMDLINE_LINUX_DEFAULT` e adicione os parâmetros:
 
-```
+```bash
 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash acpi_osi=Linux pcie_aspm=off mem_sleep_default=deep usbcore.autosuspend=-1"
 ```
 
-> **O que cada parâmetro faz:**
+**O que cada parâmetro faz:**
+
 > - `acpi_osi=Linux` — informa ao firmware que o sistema é Linux, melhorando compatibilidade ACPI
 > - `pcie_aspm=off` — desabilita gerenciamento de energia PCIe agressivo que pode causar instabilidade
 > - `mem_sleep_default=deep` — força suspensão S3 (deep sleep) como padrão
@@ -133,7 +135,7 @@ Dê permissão de execução:
 sudo chmod +x /usr/lib/systemd/system-sleep/fix-xhci.sh
 ```
 
-> **⚠️ Atenção:** Não adicione `modprobe -r` para remover módulos de rede nesse script. Remover módulos durante o processo de suspensão pode causar kernel panic e desligamento forçado.
+> **Atenção:** Não adicione `modprobe -r` para remover módulos de rede nesse script. Remover módulos durante o processo de suspensão pode causar kernel panic e desligamento forçado.
 
 ---
 
@@ -190,21 +192,23 @@ sensors | grep -i fan
 
 ---
 
-## 🔍 Como verificar os logs após suspensão
+## Como verificar os logs após suspensão
 
 ```bash
 journalctl -b 0 | grep -i -E "suspend|resume|fan|thermal|xhci" | tail -40
 ```
 
 **Saída esperada (sistema saudável):**
-```
+
+```bash
 kernel: PM: suspend entry (deep)
 kernel: PM: suspend exit
 systemd-sleep: System returned from sleep operation 'suspend'.
 ```
 
 **O erro abaixo é cosmético e pode ser ignorado** — é um bug do driver do Thunderbolt Intel e não afeta o funcionamento:
-```
+
+```bash
 xhci_hcd 0000:38:00.0: xHC error in resume, USBSTS 0x401, Reinit
 ```
 
@@ -212,7 +216,7 @@ xhci_hcd 0000:38:00.0: xHC error in resume, USBSTS 0x401, Reinit
 
 ## 🗺️ Mapa dos controladores USB (referência para o FX608JHR)
 
-```
+```bash
 0000:00:14.0  →  usb1 (480M)   Mouse, teclado, webcam, Bluetooth
               →  usb2 (20Gbps)
 0000:38:00.0  →  usb3 (480M)   Thunderbolt / USB-C PD
@@ -223,10 +227,10 @@ xhci_hcd 0000:38:00.0: xHC error in resume, USBSTS 0x401, Reinit
 
 ---
 
-## 📁 Arquivos modificados — resumo
+## Arquivos modificados — resumo
 
 | Arquivo | Finalidade |
-|---------|-----------|
+| --------- | ----------- |
 | `/etc/default/grub` | Parâmetros de boot do kernel |
 | `/usr/lib/systemd/system-sleep/fix-xhci.sh` | Hook de suspensão para controle dos wakeup sources |
 | `/etc/modprobe.d/nvidia-power.conf` | Configuração da NVIDIA para suspensão |
@@ -257,7 +261,7 @@ ls /sys/bus/pci/devices/*/usb*/
 
 ---
 
-## ℹ️ Notas adicionais
+## ℹNotas adicionais
 
 - O erro `ucsi_acpi USBC000:00: failed to re-enable notifications (-110)` é um bug conhecido do UCSI no Thunderbolt e não tem impacto no funcionamento
 - O erro `NVML is missing` do LACT daemon após o resume é cosmético — a GPU funciona normalmente
@@ -266,4 +270,4 @@ ls /sys/bus/pci/devices/*/usb*/
 
 ---
 
-*Testado em maio de 2026 · ASUS TUF Gaming F16 FX608JHR · Ubuntu · Kernel 6.17*
+Testado em maio de 2026 · ASUS TUF Gaming F16 FX608JHR · Ubuntu · Kernel 6.17

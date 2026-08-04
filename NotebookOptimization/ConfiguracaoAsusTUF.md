@@ -5,17 +5,18 @@ Este documento serve como um guia de referência para as configurações de hard
 ---
 
 ## 1. Correção Crítica: Suspensão do Sistema (Driver NVIDIA)
+
 O problema de o notebook não acordar, ou travar em tela preta ao suspender, era causado pela falha do driver NVIDIA em preservar a memória de vídeo.
 
 **Ações realizadas:**
 
-1. Habilitação dos serviços de orquestração do systemd:
+### 1 Habilitação dos serviços de orquestração do systemd
 
 ```bash
 sudo systemctl enable nvidia-suspend.service nvidia-hibernate.service nvidia-resume.service
 ```
 
-2. Forçar preservação de alocação de memória (VRAM):
+### 2 Forçar preservação de alocação de memória (VRAM)
 
 Criação do arquivo `/etc/modprobe.d/nvidia-power-management.conf` com o parâmetro:
 
@@ -23,7 +24,7 @@ Criação do arquivo `/etc/modprobe.d/nvidia-power-management.conf` com o parâm
 options nvidia NVreg_PreserveVideoMemoryAllocations=1
 ```
 
-3. Atualização da imagem de inicialização:
+### 3 Atualização da imagem de inicialização
 
 ```bash
 sudo update-initramfs -u
@@ -96,7 +97,7 @@ Comandos:
 ## 6. Guia Rápido de Comandos (Cheat Sheet)
 
 | Objetivo | Comando |
-|---|---|
+| --- | --- |
 | Alternar perfil de energia | `asusctl profile next` |
 | Monitorar temperatura/ventoinhas | `watch -n 1 sensors` |
 | Modo economia extrema | `supergfxctl -m integrated` |
