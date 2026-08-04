@@ -105,25 +105,22 @@ java -version
 - `gnome-boxes` - Virtual machine manager for GNOME desktops.
 - `texstudio` - LaTeX editor for scientific and technical writing.
 - `gnome-firmware` - GNOME firmware utility for supported hardware.
+- `code` - Visual Studio Code, general-purpose IDE.
+- `sublime-text` - Lightweight text editor.
 
 ### GNOME and desktop experience
 
 - `gnome-shell-extension-manager` - Installs and manages GNOME Shell extensions.
 - `gnome-tweaks` - Adjusts GNOME appearance and behavior beyond default settings.
 
-## Snap Packages
-
-- `code` - Visual Studio Code, the main general-purpose IDE in the script.
-- `intellij-idea-community` - JetBrains Java IDE for larger Java projects.
-- `sublime-text` - Lightweight text editor for quick edits.
-- `dbeaver-ce` - Database client for browsing and querying multiple engines.
-- `postman` - API testing and request client.
-- `discord` - Communication app for chat and calls.
-- `thunderbird` - Desktop email client and organizer.
-- `firefox` - Mozilla Firefox browser.
-
 ## Flatpak Packages
 
+- `com.jetbrains.IntelliJ-IDEA-Community` - JetBrains Java IDE for larger Java projects.
+- `io.dbeaver.DBeaverCommunity` - Database client for browsing and querying multiple engines.
+- `com.getpostman.Postman` - API testing and request client.
+- `com.discordapp.Discord` - Communication app for chat and calls.
+- `org.mozilla.Thunderbird` - Desktop email client and organizer.
+- `org.mozilla.firefox` - Mozilla Firefox browser.
 - `com.github.reds.LogisimEvolution` - Logic circuit designer for digital electronics exercises.
 - `com.heroicgameslauncher.hgl` - Launcher for Epic Games and GOG libraries.
 - `com.usebottles.bottles` - Windows compatibility manager built around Wine.
@@ -150,6 +147,8 @@ These tools now live in the APT section because the script prefers native packag
 - `gnome-boxes`
 - `texstudio`
 - `gnome-firmware`
+- `code`
+- `sublime-text`
 
 ## Runtime notes
 
@@ -192,32 +191,6 @@ Search and inspect:
 ```bash
 apt search keyword
 apt policy package-name
-```
-
-### Snap
-
-Install:
-
-```bash
-sudo snap install package-name
-```
-
-Update:
-
-```bash
-sudo snap refresh
-```
-
-Remove:
-
-```bash
-sudo snap remove package-name
-```
-
-List installed snaps:
-
-```bash
-snap list
 ```
 
 ### Flatpak

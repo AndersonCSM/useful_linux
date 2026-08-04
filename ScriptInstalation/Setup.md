@@ -47,11 +47,10 @@ less setup_updated.sh
 
 ## What gets installed
 
-The script installs tools in three layers:
+The script installs tools in two main layers:
 
-- APT for native Ubuntu packages and external APT repositories
-- Snap for IDEs and a few desktop utilities that are still convenient there
-- Flatpak for specialized desktop apps and sandboxed tools
+- APT for native Ubuntu packages and external APT repositories (including VS Code and Sublime Text)
+- Flatpak for specialized desktop apps, browsers, and sandboxed tools
 
 The detailed tool list lives in [ConfigToolsApps.md](ConfigToolsApps.md).
 
@@ -88,7 +87,7 @@ Highlights:
 - `python`, `pip`, `node-version` for development checks
 - `psql-start`, `psql-stop`, `psql-status`, `psql-restart` for PostgreSQL
 - `mkproject` for creating project folders quickly
-- `update-all` for refreshing APT and Snap
+- `update-all` for refreshing APT and Flatpak
 
 ## Project folders
 

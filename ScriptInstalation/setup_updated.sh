@@ -33,6 +33,14 @@ wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo t
 sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
 
+# Visual Studio Code
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/keyrings/packages.microsoft.gpg > /dev/null
+echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
+
+# Sublime Text
+wget -qO- https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/keyrings/sublimehq-archive.gpg > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/sublimehq-archive.gpg] https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list > /dev/null
+
 sudo apt update
 
 # 3. Core tools, Python, Node.js, JDK, and PostgreSQL
@@ -65,6 +73,8 @@ APT_PACKAGES=(
     gnome-boxes
     texstudio
     gnome-firmware
+    code
+    sublime-text
 )
 
 sudo apt install -y "${APT_PACKAGES[@]}"
@@ -72,30 +82,7 @@ sudo apt install -y "${APT_PACKAGES[@]}"
 # Set Brave as the system default browser
 xdg-settings set default-web-browser brave-browser.desktop || true
 
-# 5. Snap installs (IDEs, development tools, browsers)
-echo "--> Installing development tools via Snap..."
-
-install_snap() {
-    local snap_name=$1
-    local snap_display=$2
-    echo "--> Installing ${snap_display}..."
-    if sudo snap install "$snap_name" "${@:3}" 2>/dev/null; then
-        echo "✓ ${snap_display} installed successfully"
-    else
-        echo "⚠ Warning: ${snap_display} is already installed or an error occurred"
-    fi
-}
-
-install_snap "code" "Visual Studio Code" "--classic"
-install_snap "intellij-idea-community" "IntelliJ IDEA Community" "--classic"
-install_snap "sublime-text" "Sublime Text" "--classic"
-install_snap "dbeaver-ce" "DBeaver Community"
-install_snap "postman" "Postman"
-install_snap "discord" "Discord"
-install_snap "thunderbird" "Thunderbird"
-install_snap "firefox" "Firefox"
-
-# 6. Flatpak installs (specialized applications)
+# 5. Flatpak installs (desktop and specialized applications)
 echo "--> Installing applications via Flatpak..."
 
 install_flatpak() {
@@ -117,6 +104,12 @@ install_flatpak "com.github.marhkb.Pods" "Pods"
 install_flatpak "com.github.tchx84.Flatseal" "Flatseal"
 install_flatpak "hub.astralvixen.geforce-infinity" "GeForce Infinity"
 install_flatpak "io.github.ilya_zlobintsev.LACT" "LACT (AMD GPU)"
+install_flatpak "com.jetbrains.IntelliJ-IDEA-Community" "IntelliJ IDEA Community"
+install_flatpak "io.dbeaver.DBeaverCommunity" "DBeaver Community"
+install_flatpak "com.getpostman.Postman" "Postman"
+install_flatpak "com.discordapp.Discord" "Discord"
+install_flatpak "org.mozilla.Thunderbird" "Thunderbird"
+install_flatpak "org.mozilla.firefox" "Firefox"
 
 # 7. Hardware management (ASUS TUF automatic service)
 echo "--> Configuring the Asusctl boot service..."
@@ -194,8 +187,8 @@ mkproject() {
 update-all() {
     echo "Updating APT..."
     sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
-    echo "Updating Snap..."
-    sudo snap refresh
+    echo "Updating Flatpak..."
+    sudo flatpak update -y
     echo "✓ Everything is up to date!"
 }
 EOF
